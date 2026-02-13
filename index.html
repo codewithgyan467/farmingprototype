@@ -490,8 +490,7 @@
                 <!-- Phone Simulator -->
                 <div class="phone-mockup">
                     <div class="bg-gray-900 text-white px-5 py-3 text-xs flex justify-between items-center z-10 relative">
-                        <span>09:41 </span>
-                        <span>iphone 69pro max</span>
+                        <span>09:41</span>
                         <div class="flex gap-2">
                             <i class="ph ph-wifi-high"></i>
                             <i class="ph ph-battery-full"></i>
@@ -950,11 +949,24 @@
 
         function speakApp(text, lang) {
             window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text);
-            if (lang === 'hi') utterance.lang = 'hi-IN';
-            else if (lang === 'en') utterance.lang = 'en-US';
-            else utterance.lang = 'hi-IN'; // Fallback for Assamese
-            window.speechSynthesis.speak(utterance);
+            
+            // Mapping for Google TTS (Assamese often lacks TTS, use Bengali as closest proxy or Hindi)
+            let apiLang = lang;
+            if (lang === 'as') apiLang = 'bn'; 
+
+            const url = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=${apiLang}&q=${encodeURIComponent(text)}`;
+
+            const audio = new Audio(url);
+            
+            audio.play().catch(e => {
+                // Fallback to Native Browser TTS
+                console.log("API TTS failed, switching to native", e);
+                const utterance = new SpeechSynthesisUtterance(text);
+                if (lang === 'hi') utterance.lang = 'hi-IN';
+                else if (lang === 'en') utterance.lang = 'en-US';
+                else utterance.lang = 'hi-IN'; 
+                window.speechSynthesis.speak(utterance);
+            });
         }
 
         // --- Charts ---
