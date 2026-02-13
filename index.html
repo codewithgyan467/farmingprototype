@@ -3,23 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Democratizing Smart Farming in NE India</title>
+    <title>Democratizing Smart Farming - AEC Project</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Phosphor Icons (for new interactive controls only) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
-        /* Chosen Palette: Earth & Sprout
-           Background: #FAFAF9 (Warm Neutral)
-           Primary: #15803D (Green-700)
-           Secondary: #9A3412 (Orange-800/Earth)
-           Accent: #CA8A04 (Yellow-600/Harvest)
-        */
+        /* Modern Nature Background with Depth */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #FAFAF9;
             color: #1C1917;
+            scroll-behavior: smooth;
+            background-color: #f0fdf4; /* Green-50 base */
+            /* Subtle dot pattern */
+            background-image: radial-gradient(#15803d 0.8px, transparent 0.8px), radial-gradient(#15803d 0.8px, #f0fdf4 0.8px);
+            background-size: 24px 24px;
+            background-position: 0 0, 12px 12px;
+            min-height: 100vh;
         }
 
-        /* Chart Container Styling - Strict Adherence */
+        /* Gradient Overlay for better text readability */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(160deg, rgba(240, 253, 244, 0.85) 0%, rgba(255, 251, 235, 0.85) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Glassmorphism Utility Class */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+        }
+
+        /* Glass Cards Hover Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-color: rgba(21, 128, 61, 0.3);
+        }
+
+        /* Chart Container Styling */
         .chart-container {
             position: relative;
             width: 100%;
@@ -36,15 +73,18 @@
             }
         }
 
-        /* Custom Phone Simulator Styling */
+        /* Phone Simulator Styling */
         .phone-mockup {
-            border: 8px solid #333;
-            border-radius: 24px;
+            border: 8px solid #2d2d2d;
+            border-radius: 36px;
             overflow: hidden;
             position: relative;
             background: #fff;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
             transition: transform 0.3s ease;
+            width: 300px;
+            height: 600px;
+            margin: 0 auto; /* Center on mobile */
         }
         
         .mic-btn {
@@ -57,14 +97,48 @@
             100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
         }
 
-        /* Interactive Card Hover Effects */
-        .info-card {
-            transition: all 0.3s ease;
-            cursor: pointer;
+        /* --- Custom Animations for Simulator --- */
+        
+        /* 1. Scanning Laser (Pesticide & Disease) */
+        @keyframes scan-laser {
+            0% { top: 10%; opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { top: 80%; opacity: 0; }
         }
-        .info-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .scan-laser {
+            position: absolute;
+            left: 10%;
+            width: 80%;
+            height: 2px;
+            background-color: #ef4444;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+            animation: scan-laser 2s ease-in-out infinite;
+            z-index: 20;
+        }
+
+        /* 2. Radar Sweep (Weather) */
+        @keyframes radar-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .radar-sweep {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, transparent 0deg, rgba(59, 130, 246, 0.3) 60deg, transparent 60deg);
+            animation: radar-spin 2s linear infinite;
+            top: 0; left: 0;
+        }
+
+        /* 3. Growing Bars (Soil) */
+        @keyframes grow-bar {
+            0% { height: 0%; }
+            100% { height: 100%; }
+        }
+        .bar-grow {
+            animation: grow-bar 1.5s ease-out forwards;
         }
 
         /* Tab Navigation */
@@ -72,6 +146,7 @@
             border-bottom: 3px solid #15803D;
             color: #15803D;
             font-weight: bold;
+            background: rgba(240, 253, 244, 0.5);
         }
         .tab-inactive {
             border-bottom: 3px solid transparent;
@@ -79,6 +154,7 @@
         }
         .tab-inactive:hover {
             color: #15803D;
+            background: rgba(255, 255, 255, 0.5);
         }
 
         /* Gradient Text */
@@ -88,414 +164,474 @@
             -webkit-text-fill-color: transparent;
             background-image: linear-gradient(to right, #15803D, #CA8A04);
         }
+
+        /* AI Guide Bot Styling */
+        .guide-bot {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .guide-bot:hover { transform: scale(1.1); }
+        .guide-bubble {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 260px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px 15px 0 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+            z-index: 999;
+            display: none;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
     </style>
-    <!-- Application Structure Plan: 
-         1. Hero Section: Sets the context of North East India.
-         2. The Challenge (Interactive Grid): Users explore the 3 main barriers (Literacy, Cost, Data).
-         3. The Phygital Ecosystem (Concept Map): Interactive block diagram explaining the App + IoT + Satellite fusion.
-         4. Experience "Agri-Vani" (Simulator): A central interactive feature where users "use" the app to understand the Zero-UI concept.
-         5. Technical Architecture (Tabs): Deep dive into Satellite Fusion, IoT, and Yield Forecasting with charts.
-         6. Impact Dashboard (Charts): Visualizing the economic and environmental benefits.
-         7. Implementation Strategy: Comparison table of tiers.
-    -->
-    <!-- Visualization & Content Choices:
-         - Cost Barrier -> Bar Chart: Dramatically contrasts ₹50k vs ₹50 cost. Goal: Compare.
-         - Resource Saving -> Doughnut Chart: visualizes 30% water saving. Goal: Inform/Impact.
-         - App Simulation -> DOM Manipulation: Replaces static screenshots with a live-feeling demo. Goal: Engagement/Understanding.
-         - Tech Architecture -> Interactive text/flow: Explains complex "Fusion" simply. Goal: Inform.
-         - NO SVG/Mermaid used. All visuals via CSS shapes, Unicode, or Chart.js.
-    -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
 </head>
 <body class="antialiased">
 
-    <!-- Navigation -->
-    <nav class="bg-white shadow-sm sticky top-0 z-50">
+    <!-- AI Guide Bot -->
+    <div class="guide-bot" onclick="toggleGuide()">
+        <div class="w-14 h-14 md:w-16 md:h-16 bg-blue-600 rounded-full flex items-center justify-center text-white text-3xl shadow-lg border-4 border-white/50 backdrop-blur">
+            🤖
+        </div>
+    </div>
+    <div id="guide-bubble" class="guide-bubble">
+        <p class="text-sm text-gray-700 mb-2" id="guide-text">Hi! I'm your Research Guide. I can explain the project or help you try the App Demo below!</p>
+        <button onclick="speakGuide(document.getElementById('guide-text').innerText)" class="text-blue-600 text-xs font-bold uppercase tracking-wide flex items-center gap-1">
+            <i class="ph ph-speaker-high"></i> Listen
+        </button>
+    </div>
+
+    <!-- Navigation (Transparent Glass) -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-white/40">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between h-16">
                 <div class="flex items-center">
-                    <span class="text-2xl font-bold text-green-800">Agri<span class="text-yellow-600">Vani</span></span>
+                    <span class="text-2xl font-bold text-green-800 flex items-center gap-2">
+                        <i class="ph ph-plant"></i> Agri<span class="text-yellow-600">Vani</span>
+                    </span>
                 </div>
+                <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center space-x-8">
-                    <button onclick="scrollToSection('context')" class="text-gray-600 hover:text-green-700">Context</button>
-                    <button onclick="scrollToSection('solution')" class="text-gray-600 hover:text-green-700">Solution</button>
-                    <button onclick="scrollToSection('demo')" class="text-gray-600 hover:text-green-700 font-semibold text-green-700 bg-green-50 px-3 py-1 rounded-full">Try the App</button>
-                    <button onclick="scrollToSection('impact')" class="text-gray-600 hover:text-green-700">Impact</button>
+                    <button onclick="scrollToSection('context')" class="text-gray-700 hover:text-green-700 font-medium transition">Context</button>
+                    <button onclick="scrollToSection('solution')" class="text-gray-700 hover:text-green-700 font-medium transition">Solution</button>
+                    <button onclick="scrollToSection('new-ideas')" class="text-orange-700 hover:text-orange-900 font-medium transition">New Ideas</button>
+                    <button onclick="scrollToSection('demo')" class="text-green-700 hover:text-green-900 font-bold bg-green-100/50 px-4 py-2 rounded-full border border-green-200 transition shadow-sm hover:shadow">Try the App</button>
+                    <button onclick="scrollToSection('impact')" class="text-gray-700 hover:text-green-700 font-medium transition">Impact</button>
                 </div>
-                <!-- Mobile Menu Button (Simplified) -->
+                <!-- Mobile Menu Button -->
                 <div class="md:hidden flex items-center">
-                    <button class="text-gray-600 text-2xl" onclick="toggleMobileMenu()">≡</button>
+                    <button class="text-gray-700 text-3xl" onclick="toggleMobileMenu()">
+                        <i class="ph ph-list"></i>
+                    </button>
                 </div>
             </div>
         </div>
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-white border-t p-4">
-             <button onclick="scrollToSection('context')" class="block w-full text-left py-2 text-gray-600">Context</button>
-             <button onclick="scrollToSection('solution')" class="block w-full text-left py-2 text-gray-600">Solution</button>
-             <button onclick="scrollToSection('demo')" class="block w-full text-left py-2 text-green-700 font-bold">Try the App</button>
-             <button onclick="scrollToSection('impact')" class="block w-full text-left py-2 text-gray-600">Impact</button>
+        <!-- Mobile Dropdown -->
+        <div id="mobile-menu" class="hidden md:hidden glass-panel border-t border-white/40 p-4 absolute w-full">
+             <button onclick="scrollToSection('context')" class="block w-full text-left py-3 text-gray-700 font-medium border-b border-gray-100">Context</button>
+             <button onclick="scrollToSection('solution')" class="block w-full text-left py-3 text-gray-700 font-medium border-b border-gray-100">Solution</button>
+             <button onclick="scrollToSection('new-ideas')" class="block w-full text-left py-3 text-orange-700 font-medium border-b border-gray-100">New Ideas</button>
+             <button onclick="scrollToSection('demo')" class="block w-full text-left py-3 text-green-700 font-bold border-b border-gray-100">Try the App</button>
+             <button onclick="scrollToSection('impact')" class="block w-full text-left py-3 text-gray-700 font-medium">Impact</button>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="bg-stone-100 py-16 sm:py-24">
+    <!-- Hero Section with Group Info -->
+    <header class="py-16 sm:py-24">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 mb-6">
-                Democratizing <span class="text-gradient">Smart Farming</span> in North East India
+            <div class="inline-block mb-6 px-4 py-1.5 rounded-full glass-panel text-green-800 text-xs font-bold uppercase tracking-wider shadow-sm">
+                Research Project
+            </div>
+            <h1 class="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 drop-shadow-sm">
+                Democratizing <span class="text-gradient">Smart Farming</span> <br class="hidden md:block" /> in North East India
             </h1>
-            <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-600">
-                Bridging the digital divide with Voice-First AI and Frugal IoT. Empowering farmers to combine traditional wisdom with satellite precision.
+            <p class="mt-4 max-w-2xl mx-auto text-lg sm:text-xl text-gray-700 font-medium">
+                Bridging the digital divide with Voice-First AI and Frugal IoT technologies.
             </p>
-            <div class="mt-8 flex justify-center gap-4">
-                <button onclick="scrollToSection('demo')" class="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-700 hover:bg-green-800 md:py-4 md:text-lg shadow-lg transform transition hover:scale-105">
-                    Experience the Innovation
-                </button>
-                <button onclick="scrollToSection('context')" class="px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 md:py-4 md:text-lg">
-                    Read the Report
+
+            <!-- Group Details (Glass Card) -->
+            <div class="mt-10 glass-panel p-6 rounded-2xl max-w-4xl mx-auto text-left relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-green-200 rounded-full blur-3xl opacity-30 -translate-y-1/2 translate-x-1/2"></div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Institution</p>
+                        <p class="font-bold text-gray-900 text-lg">Assam Engineering College</p>
+                        <p class="text-sm text-gray-600">Jalukbari, Assam - 781013</p>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">Department</p>
+                        <p class="font-bold text-gray-900 text-lg">MCA 2nd Semester</p>
+                    </div>
+                </div>
+                <div class="mt-6 pt-6 border-t border-gray-200/50 relative z-10">
+                    <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Research Group</p>
+                    <div class="flex flex-wrap gap-3">
+                        <span class="px-4 py-1.5 bg-white/60 border border-green-100 text-green-800 rounded-full text-sm font-medium shadow-sm">Gyandeep Duwarah</span>
+                        <span class="px-4 py-1.5 bg-white/60 border border-green-100 text-green-800 rounded-full text-sm font-medium shadow-sm">Purnita Rabha</span>
+                        <span class="px-4 py-1.5 bg-white/60 border border-green-100 text-green-800 rounded-full text-sm font-medium shadow-sm">Priyanshu Pratim Bora</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-10 flex justify-center">
+                <button onclick="scrollToSection('demo')" class="px-8 py-4 bg-gradient-to-r from-green-700 to-green-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all flex items-center gap-2">
+                    <i class="ph ph-play-circle text-xl"></i> Experience the Innovation
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Section 1: The Context & Challenge -->
-    <section id="context" class="py-16 bg-white">
+    <!-- Context Section -->
+    <section id="context" class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
-                <h2 class="text-3xl font-bold text-gray-900">The Challenge in North East India</h2>
+                <h2 class="text-3xl font-bold text-gray-900">The Challenge</h2>
                 <p class="mt-4 text-gray-600 max-w-3xl mx-auto">
-                    The "Organic Hub" of India faces unique hurdles. Hilly terrain, shifting cultivation (Jhum), and remote valleys create a disconnect between modern agritech and the farmer on the ground.
+                    Unique barriers in North East India prevent adoption of standard agritech.
                 </p>
             </div>
-
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <!-- Challenge Card 1 -->
-                <div class="info-card bg-stone-50 p-6 rounded-xl border border-stone-200">
-                    <div class="text-4xl mb-4">📖</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Literacy Barrier</h3>
-                    <p class="text-gray-600">
-                        90% of agritech apps use text menus and complex dashboards. For a farmer who cannot read, these tools are inaccessible.
-                    </p>
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="text-5xl mb-4 text-center">📖</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 text-center">Literacy Barrier</h3>
+                    <p class="text-gray-600 text-center text-sm">90% of apps use text. Our target users cannot read complex menus.</p>
                 </div>
-                <!-- Challenge Card 2 -->
-                <div class="info-card bg-stone-50 p-6 rounded-xl border border-stone-200">
-                    <div class="text-4xl mb-4">💰</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Cost Barrier</h3>
-                    <p class="text-gray-600">
-                        Standard IoT weather stations cost ₹50,000+. This is economically unviable for smallholders with less than 1 hectare of land.
-                    </p>
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="text-5xl mb-4 text-center">💰</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 text-center">Cost Barrier</h3>
+                    <p class="text-gray-600 text-center text-sm">Standard IoT stations cost ₹50,000+. Too expensive for small farms.</p>
                 </div>
-                <!-- Challenge Card 3 -->
-                <div class="info-card bg-stone-50 p-6 rounded-xl border border-stone-200">
-                    <div class="text-4xl mb-4">📡</div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-2">Connectivity & Data Gap</h3>
-                    <p class="text-gray-600">
-                        Cloud processing fails in remote valleys. Satellite data exists but lacks the "Ground Truth" precision needed for small plots.
-                    </p>
+                <div class="glass-card p-8 rounded-2xl">
+                    <div class="text-5xl mb-4 text-center">📡</div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2 text-center">Connectivity</h3>
+                    <p class="text-gray-600 text-center text-sm">Cloud AI fails in remote valleys. We need offline solutions.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 2: The Solution (Phygital Ecosystem) -->
-    <section id="solution" class="py-16 bg-green-50">
+    <!-- Solution Section (Restored Interactive Toggles) -->
+    <section id="solution" class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-900">The "Phygital" Solution</h2>
                 <p class="mt-4 text-gray-600 max-w-3xl mx-auto">
-                    We propose a dual-layer ecosystem merging high-tech satellite data with low-tech accessibility. Explore the two layers below.
+                    Merging high-tech satellite data with low-tech accessibility.
                 </p>
             </div>
 
             <!-- Interactive Toggle View -->
             <div class="flex justify-center mb-8">
-                <div class="bg-white p-1 rounded-lg shadow-sm border border-gray-200 inline-flex">
-                    <button id="btn-digital" onclick="switchSolution('digital')" class="px-6 py-2 rounded-md text-sm font-medium bg-green-700 text-white shadow-sm transition-all">
+                <div class="glass-panel p-1 rounded-xl shadow-sm inline-flex">
+                    <button id="btn-digital" onclick="switchSolution('digital')" class="px-6 py-2 rounded-lg text-sm font-bold bg-green-700 text-white shadow-sm transition-all">
                         Digital Layer (App)
                     </button>
-                    <button id="btn-physical" onclick="switchSolution('physical')" class="px-6 py-2 rounded-md text-sm font-medium text-gray-600 hover:text-green-700 transition-all">
+                    <button id="btn-physical" onclick="switchSolution('physical')" class="px-6 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-green-700 transition-all">
                         Physical Layer (IoT)
                     </button>
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 min-h-[400px] flex flex-col md:flex-row">
+            <!-- Glass Toggle Container -->
+            <div class="glass-panel rounded-3xl shadow-xl overflow-hidden border border-white/50 min-h-[400px] flex flex-col md:flex-row">
                 
                 <!-- Content Area -->
-                <div class="w-full md:w-1/2 p-8 flex flex-col justify-center">
-                    <div id="solution-content-digital">
-                        <h3 class="text-2xl font-bold text-green-800 mb-4">Agri-Vani App</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start">
-                                <span class="text-2xl mr-3">🗣️</span>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">Voice-First, Text-Free</h4>
-                                    <p class="text-sm text-gray-600">Operates entirely via voice commands in local dialects (Assamese, Bodo, Khasi).</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <span class="text-2xl mr-3">📱</span>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">Edge AI (Offline)</h4>
-                                    <p class="text-sm text-gray-600">Runs TensorFlow Lite models directly on the phone. Diagnoses diseases without internet.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <span class="text-2xl mr-3">📍</span>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">Zero Cost Entry</h4>
-                                    <p class="text-sm text-gray-600">Uses the farmer's existing Android phone. No new hardware required for basic features.</p>
-                                </div>
-                            </div>
+                <div class="w-full md:w-1/2 p-10 flex flex-col justify-center relative">
+                    <!-- Decor -->
+                    <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-green-50/50 to-transparent z-0"></div>
+                    
+                    <div class="relative z-10">
+                        <!-- Digital Content -->
+                        <div id="solution-content-digital">
+                            <h3 class="text-2xl font-bold text-green-800 mb-6">Agri-Vani App</h3>
+                            <ul class="space-y-4">
+                                <li class="flex items-center gap-4 bg-white/50 p-3 rounded-lg"><span class="text-2xl">🗣️</span> <div><span class="font-bold text-gray-800 block">Voice-First</span><span class="text-xs text-gray-600">Local dialects supported</span></div></li>
+                                <li class="flex items-center gap-4 bg-white/50 p-3 rounded-lg"><span class="text-2xl">📱</span> <div><span class="font-bold text-gray-800 block">Edge AI (Offline)</span><span class="text-xs text-gray-600">Works without internet</span></div></li>
+                                <li class="flex items-center gap-4 bg-white/50 p-3 rounded-lg"><span class="text-2xl">📍</span> <div><span class="font-bold text-gray-800 block">Zero Cost Entry</span><span class="text-xs text-gray-600">Uses existing phone</span></div></li>
+                            </ul>
                         </div>
-                    </div>
 
-                    <div id="solution-content-physical" class="hidden">
-                        <h3 class="text-2xl font-bold text-orange-800 mb-4">The "Village Stick"</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start">
-                                <span class="text-2xl mr-3">🔌</span>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">Community Owned</h4>
-                                    <p class="text-sm text-gray-600">Shared by a cooperative (FPO). Farmers pay ₹10 to rent it for a test.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <span class="text-2xl mr-3">🔋</span>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">Energy Efficient</h4>
-                                    <p class="text-sm text-gray-600">Uses ESP32/LoRaWAN with Deep Sleep protocols. 6-12 months battery life.</p>
-                                </div>
-                            </div>
-                            <div class="flex items-start">
-                                <span class="text-2xl mr-3">🔬</span>
-                                <div>
-                                    <h4 class="font-bold text-gray-900">Ground Truth</h4>
-                                    <p class="text-sm text-gray-600">Provides precise NPK, pH, and moisture data to calibrate satellite readings.</p>
-                                </div>
-                            </div>
+                        <!-- Physical Content -->
+                        <div id="solution-content-physical" class="hidden">
+                            <h3 class="text-2xl font-bold text-orange-800 mb-6">The "Village Stick"</h3>
+                            <ul class="space-y-4">
+                                <li class="flex items-center gap-4 bg-white/50 p-3 rounded-lg"><span class="text-2xl">🔌</span> <div><span class="font-bold text-gray-800 block">Community Owned</span><span class="text-xs text-gray-600">Shared by FPO. Rent for ₹10.</span></div></li>
+                                <li class="flex items-center gap-4 bg-white/50 p-3 rounded-lg"><span class="text-2xl">🔋</span> <div><span class="font-bold text-gray-800 block">Energy Efficient</span><span class="text-xs text-gray-600">Deep Sleep protocols (6mo battery)</span></div></li>
+                                <li class="flex items-center gap-4 bg-white/50 p-3 rounded-lg"><span class="text-2xl">🔬</span> <div><span class="font-bold text-gray-800 block">Ground Truth</span><span class="text-xs text-gray-600">Precise NPK, pH data calibration</span></div></li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <!-- Visual/Chart Area -->
-                <div class="w-full md:w-1/2 bg-stone-100 p-8 flex items-center justify-center border-l border-stone-200">
+                <!-- Visual Area -->
+                <div class="w-full md:w-1/2 bg-white/40 p-8 flex items-center justify-center border-t md:border-t-0 md:border-l border-white/50">
+                    
+                    <!-- Digital Visual (Chart) -->
                     <div id="solution-visual-digital" class="w-full">
-                        <h4 class="text-center font-semibold text-gray-500 mb-4">Cost Comparison: Traditional vs. Agri-Vani</h4>
                         <div class="chart-container">
                             <canvas id="costChart"></canvas>
                         </div>
-                        <p class="text-xs text-center text-gray-500 mt-2">Drastic reduction in entry barrier cost.</p>
+                        <p class="text-xs text-center text-gray-500 mt-4">Drastic reduction in implementation cost.</p>
                     </div>
 
+                    <!-- Physical Visual (Stick Info) -->
                     <div id="solution-visual-physical" class="hidden w-full text-center">
-                         <div class="bg-white p-6 rounded-xl shadow-inner border border-stone-200 inline-block">
+                         <div class="glass-card p-8 rounded-3xl inline-block">
                              <div class="text-6xl mb-4">🦯</div>
                              <h4 class="text-xl font-bold text-gray-800">The Village Stick</h4>
-                             <p class="text-sm text-gray-500 mt-2">Sensors: NPK, pH, Moisture</p>
-                             <div class="mt-4 flex justify-center gap-2">
-                                 <span class="px-2 py-1 bg-green-100 text-green-800 text-xs rounded">ESP32</span>
-                                 <span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded">LoRaWAN</span>
-                                 <span class="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded">Deep Sleep</span>
+                             <p class="text-sm text-gray-600 mt-2 font-medium">Sensors: NPK, pH, Moisture</p>
+                             <div class="mt-6 flex flex-wrap justify-center gap-2">
+                                 <span class="px-3 py-1 bg-green-100 text-green-800 text-xs font-bold rounded-full">ESP32</span>
+                                 <span class="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-bold rounded-full">LoRaWAN</span>
+                                 <span class="px-3 py-1 bg-yellow-100 text-yellow-800 text-xs font-bold rounded-full">Deep Sleep</span>
                              </div>
                          </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW Ideas Section -->
+    <section id="new-ideas" class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <span class="bg-yellow-100 text-yellow-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">New Research</span>
+                <h2 class="text-3xl font-bold text-gray-900 mt-4">Safety & Cost Saving Ideas</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Pesticide Safety -->
+                <div class="glass-card p-8 rounded-2xl border-l-4 border-l-red-500 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 opacity-10 group-hover:opacity-20 transition transform group-hover:scale-110">
+                        <i class="ph ph-warning-octagon text-9xl text-red-600"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-4xl p-2 bg-red-100 rounded-lg">☠️</span>
+                            <h3 class="text-xl font-bold text-red-800">Pesticide Safety Scanner</h3>
+                        </div>
+                        <p class="text-gray-800 font-semibold mb-2">The "Fake News" Filter for Chemicals</p>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Farmers often buy harmful chemicals. This feature uses the camera to scan bottle labels and warns: <span class="font-bold text-red-600">"Stop! Kills Bees."</span></p>
+                        <div class="inline-block bg-red-50 px-4 py-2 rounded-lg border border-red-200 text-xs font-bold text-red-700">Cost: ₹0 (Software)</div>
+                    </div>
+                </div>
+
+                <!-- Weed Management -->
+                <div class="glass-card p-8 rounded-2xl border-l-4 border-l-green-500 relative overflow-hidden group">
+                    <div class="absolute right-0 top-0 opacity-10 group-hover:opacity-20 transition transform group-hover:scale-110">
+                        <i class="ph ph-plant text-9xl text-green-600"></i>
+                    </div>
+                    <div class="relative z-10">
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="text-4xl p-2 bg-green-100 rounded-lg">🌿</span>
+                            <h3 class="text-xl font-bold text-green-800">Smart Weed ID</h3>
+                        </div>
+                        <p class="text-gray-800 font-semibold mb-2">Early Invasive Detection</p>
+                        <p class="text-sm text-gray-600 mb-4 leading-relaxed">Detects invasive weeds like <em>Mikania micrantha</em> at the seedling stage. Advises manual removal before expensive herbicides are needed.</p>
+                        <div class="inline-block bg-green-50 px-4 py-2 rounded-lg border border-green-200 text-xs font-bold text-green-700">Benefit: 100% Herbicide Savings</div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 3: App Demo (Simulator) -->
-    <section id="demo" class="py-16 bg-white overflow-hidden">
+    <!-- Demo Section (Updated) -->
+    <section id="demo" class="py-16 overflow-hidden">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
              <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-gray-900">Experience "Agri-Vani"</h2>
                 <p class="mt-4 text-gray-600 max-w-2xl mx-auto">
-                    Try the "Zero-UI" concept. Interact with the simulator below to see how an illiterate farmer would use the app to check soil health or detect diseases.
+                    Try the "Zero-UI" concept. Select a language and tap an app to start.
                 </p>
             </div>
 
-            <div class="flex flex-col md:flex-row items-center justify-center gap-12">
+            <div class="flex flex-col md:flex-row items-start justify-center gap-12">
                 
-                <!-- Controls -->
+                <!-- Controls Panel -->
                 <div class="w-full md:w-1/3 space-y-6">
-                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200">
-                        <h3 class="font-bold text-gray-900 mb-4">Choose a Scenario</h3>
-                        <div class="space-y-3">
-                            <button onclick="runSimulation('disease')" class="w-full text-left px-4 py-3 bg-white hover:bg-green-50 border border-gray-200 rounded-lg shadow-sm transition flex items-center group">
-                                <span class="text-2xl mr-3 group-hover:scale-110 transition">🍃</span>
-                                <div>
-                                    <div class="font-semibold text-gray-800">Disease Detection</div>
-                                    <div class="text-xs text-gray-500">"My leaves have spots"</div>
-                                </div>
-                            </button>
-                            <button onclick="runSimulation('soil')" class="w-full text-left px-4 py-3 bg-white hover:bg-orange-50 border border-gray-200 rounded-lg shadow-sm transition flex items-center group">
-                                <span class="text-2xl mr-3 group-hover:scale-110 transition">🟤</span>
-                                <div>
-                                    <div class="font-semibold text-gray-800">Soil Analysis</div>
-                                    <div class="text-xs text-gray-500">"Check my soil quality"</div>
-                                </div>
-                            </button>
-                            <button onclick="runSimulation('weather')" class="w-full text-left px-4 py-3 bg-white hover:bg-blue-50 border border-gray-200 rounded-lg shadow-sm transition flex items-center group">
-                                <span class="text-2xl mr-3 group-hover:scale-110 transition">🌦️</span>
-                                <div>
-                                    <div class="font-semibold text-gray-800">Weather Alert</div>
-                                    <div class="text-xs text-gray-500">"Will it rain today?"</div>
-                                </div>
-                            </button>
+                    <!-- Language Selector -->
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="ph ph-translate"></i> 1. Select Language
+                        </h3>
+                        <div class="grid grid-cols-3 gap-3">
+                            <button onclick="setLang('en')" id="lang-en" class="lang-btn active-lang px-3 py-2 rounded-xl text-sm font-medium border bg-green-700 text-white border-green-700 shadow-sm transition">English</button>
+                            <button onclick="setLang('hi')" id="lang-hi" class="lang-btn px-3 py-2 rounded-xl text-sm font-medium border border-gray-300 bg-white/50 hover:bg-white transition">Hindi</button>
+                            <button onclick="setLang('as')" id="lang-as" class="lang-btn px-3 py-2 rounded-xl text-sm font-medium border border-gray-300 bg-white/50 hover:bg-white transition">Assamese</button>
                         </div>
                     </div>
-                    <div class="text-sm text-gray-500 italic text-center">
-                        *The actual app uses voice in local dialects. This simulation uses English text for demonstration.
+
+                    <div class="glass-panel p-6 rounded-2xl">
+                        <h3 class="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                            <i class="ph ph-info"></i> Instructions
+                        </h3>
+                        <p class="text-gray-600 text-sm mb-4">
+                            Tap the <strong>App Icons</strong> on the phone screen to simulate a feature.
+                        </p>
+                        <div class="space-y-3 text-sm text-gray-500">
+                            <div class="flex items-center gap-2"><i class="ph ph-skull text-red-500"></i> Pesticide Scanner</div>
+                            <div class="flex items-center gap-2"><i class="ph ph-plant text-green-500"></i> Disease Detection</div>
+                            <div class="flex items-center gap-2"><i class="ph ph-mountains text-orange-500"></i> Soil Analysis</div>
+                            <div class="flex items-center gap-2"><i class="ph ph-cloud-sun text-blue-500"></i> Weather Alert</div>
+                        </div>
+                    </div>
+                    <div class="text-xs text-gray-500 italic text-center glass-panel p-2 rounded-lg">
+                        *Enable your device audio to hear the AI response.
                     </div>
                 </div>
 
                 <!-- Phone Simulator -->
-                <div class="phone-mockup w-[300px] h-[600px] bg-gray-50 relative flex flex-col">
-                    <!-- Phone Status Bar -->
-                    <div class="bg-gray-900 text-white px-4 py-1 text-xs flex justify-between items-center">
-                        <span>09:41</span>
-                        <div class="flex space-x-1">
-                            <span>📶</span><span>🔋</span>
+                <div class="phone-mockup">
+                    <div class="bg-gray-900 text-white px-5 py-3 text-xs flex justify-between items-center z-10 relative">
+                        <span>09:41 </span>
+                        <span>iphone 69pro max</span>
+                        <div class="flex gap-2">
+                            <i class="ph ph-wifi-high"></i>
+                            <i class="ph ph-battery-full"></i>
                         </div>
                     </div>
 
-                    <!-- App Header -->
-                    <div class="bg-green-700 p-4 text-white flex justify-between items-center">
+                    <div class="bg-green-700 p-4 text-white flex justify-between items-center relative z-10 shadow-md">
                         <span class="font-bold text-lg">Agri-Vani</span>
-                        <span class="text-xl">⚙️</span>
+                        <span class="text-xl"><i class="ph ph-gear"></i></span>
                     </div>
 
-                    <!-- App Content (Dynamic) -->
-                    <div id="sim-screen" class="flex-1 p-4 flex flex-col items-center justify-center overflow-y-auto relative">
-                        <!-- Idle State -->
-                        <div id="state-idle" class="text-center w-full h-full flex flex-col justify-between py-8">
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="bg-white p-4 rounded-xl shadow border border-gray-100 flex flex-col items-center justify-center aspect-square">
-                                    <span class="text-4xl mb-2">🌦️</span>
-                                </div>
-                                <div class="bg-white p-4 rounded-xl shadow border border-gray-100 flex flex-col items-center justify-center aspect-square">
-                                    <span class="text-4xl mb-2">🔍</span>
-                                </div>
+                    <div id="sim-screen" class="flex-1 h-full bg-stone-100 p-4 flex flex-col items-center justify-center overflow-y-auto relative">
+                        <!-- Idle State (App Grid) -->
+                        <div id="state-idle" class="w-full h-full flex flex-col justify-start pt-8 pb-4 px-2">
+                            <div class="text-center mb-8">
+                                <h2 class="text-4xl font-light text-gray-800">09:41</h2>
+                                <p class="text-gray-500 text-xs mt-1">Friday, 13 Feb</p>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4 w-full mb-auto px-2">
+                                <!-- Pesticide App -->
+                                <button onclick="runScenario('pesticide')" class="flex flex-col items-center gap-2 group p-2 rounded-xl hover:bg-black/5 transition">
+                                    <div class="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center text-red-600 shadow-sm border border-red-200 group-hover:scale-105 transition">
+                                        <i class="ph ph-skull text-3xl"></i>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-600">Scanner</span>
+                                </button>
+
+                                <!-- Disease App -->
+                                <button onclick="runScenario('disease')" class="flex flex-col items-center gap-2 group p-2 rounded-xl hover:bg-black/5 transition">
+                                    <div class="w-14 h-14 bg-green-100 rounded-2xl flex items-center justify-center text-green-600 shadow-sm border border-green-200 group-hover:scale-105 transition">
+                                        <i class="ph ph-plant text-3xl"></i>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-600">Dr. Crop</span>
+                                </button>
+
+                                <!-- Soil App -->
+                                <button onclick="runScenario('soil')" class="flex flex-col items-center gap-2 group p-2 rounded-xl hover:bg-black/5 transition">
+                                    <div class="w-14 h-14 bg-orange-100 rounded-2xl flex items-center justify-center text-orange-600 shadow-sm border border-orange-200 group-hover:scale-105 transition">
+                                        <i class="ph ph-mountains text-3xl"></i>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-600">Soil Lab</span>
+                                </button>
+
+                                <!-- Weather App -->
+                                <button onclick="runScenario('weather')" class="flex flex-col items-center gap-2 group p-2 rounded-xl hover:bg-black/5 transition">
+                                    <div class="w-14 h-14 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600 shadow-sm border border-blue-200 group-hover:scale-105 transition">
+                                        <i class="ph ph-cloud-sun text-3xl"></i>
+                                    </div>
+                                    <span class="text-xs font-medium text-gray-600">Weather</span>
+                                </button>
                             </div>
                             
-                            <div class="mt-8">
-                                <p class="text-gray-500 mb-4 font-medium">Tap to Speak</p>
-                                <button onclick="triggerMic()" class="mic-btn w-20 h-20 bg-green-600 rounded-full flex items-center justify-center text-white text-3xl shadow-lg hover:bg-green-700 transition mx-auto">
-                                    🎤
+                            <!-- Voice Assistant (Mic) -->
+                            <div class="mt-4 flex flex-col items-center">
+                                <button onclick="triggerManualMic()" class="mic-btn w-14 h-14 bg-green-600 rounded-full flex items-center justify-center text-white text-2xl shadow-lg hover:bg-green-700 transition mx-auto transform active:scale-95">
+                                    <i class="ph ph-microphone-fill"></i>
                                 </button>
                             </div>
                         </div>
 
                         <!-- User Speaking State -->
-                        <div id="state-listening" class="hidden text-center absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center">
-                            <div class="text-6xl mb-4 animate-bounce">🎙️</div>
-                            <p class="text-xl font-bold text-green-800">Listening...</p>
-                            <div class="w-16 h-1 bg-gray-200 mt-4 rounded overflow-hidden">
-                                <div class="h-full bg-green-600 animate-pulse w-full"></div>
-                            </div>
+                        <div id="ui-overlay" class="hidden text-center absolute inset-0 bg-white/95 backdrop-blur-sm z-20 flex-col items-center justify-center p-6">
+                             <!-- Dynamic Content -->
                         </div>
-
-                        <!-- AI Processing State -->
-                        <div id="state-processing" class="hidden text-center absolute inset-0 bg-white/95 z-10 flex flex-col items-center justify-center">
-                            <div class="text-6xl mb-4 animate-spin">⚙️</div>
-                            <p class="text-lg font-bold text-gray-600">Analyzing...</p>
-                            <p id="process-text" class="text-sm text-gray-500 mt-2">Connecting to Offline Model...</p>
-                        </div>
-
-                        <!-- Result State -->
-                        <div id="state-result" class="hidden w-full h-full absolute inset-0 bg-stone-50 z-10 p-4 overflow-y-auto">
-                            <button onclick="resetSim()" class="absolute top-2 right-2 text-gray-400 hover:text-gray-800">✖</button>
-                            <div id="result-content" class="mt-4">
-                                <!-- Dynamic Content Injected Here -->
-                            </div>
-                            <div class="mt-6 text-center">
-                                <button class="w-12 h-12 rounded-full bg-green-100 text-green-700 flex items-center justify-center mx-auto text-xl">🔊</button>
-                                <p class="text-xs text-gray-400 mt-1">Replay Audio</p>
-                            </div>
-                        </div>
+                    </div>
+                    
+                    <!-- Bottom Nav -->
+                    <div class="absolute bottom-0 w-full h-16 bg-white border-t flex justify-around items-center text-gray-400 text-2xl z-10">
+                        <i class="ph ph-house-fill text-green-600"></i>
+                        <i class="ph ph-camera"></i>
+                        <i class="ph ph-users"></i>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 4: Technical Deep Dive (Tabs) -->
-    <section class="py-16 bg-stone-100">
+    <!-- Technical Section (Restored Tabs) -->
+    <section class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
              <div class="text-center mb-10">
                 <h2 class="text-3xl font-bold text-gray-900">Technical Architecture</h2>
                 <p class="mt-4 text-gray-600">How we achieve high precision with low cost.</p>
             </div>
-
-            <div class="bg-white rounded-xl shadow-md overflow-hidden">
-                <!-- Tab Headers -->
-                <div class="flex border-b border-gray-200 overflow-x-auto">
-                    <button onclick="switchTab('fusion')" id="tab-fusion" class="flex-1 py-4 px-6 text-center text-sm font-medium tab-active transition-colors focus:outline-none whitespace-nowrap">
-                        Satellite + Sensor Fusion
-                    </button>
-                    <button onclick="switchTab('yield')" id="tab-yield" class="flex-1 py-4 px-6 text-center text-sm font-medium tab-inactive transition-colors focus:outline-none whitespace-nowrap">
-                        Crop Yield Forecasting
-                    </button>
-                    <button onclick="switchTab('edge')" id="tab-edge" class="flex-1 py-4 px-6 text-center text-sm font-medium tab-inactive transition-colors focus:outline-none whitespace-nowrap">
-                        Edge AI Logic
-                    </button>
+            
+            <!-- Tabbed Container -->
+            <div class="glass-panel rounded-3xl shadow-lg overflow-hidden border border-white/50">
+                <div class="flex border-b border-gray-200/50">
+                    <button onclick="switchTab('fusion')" id="tab-fusion" class="flex-1 py-4 text-center font-medium tab-active transition-colors">Satellite + Sensor Fusion</button>
+                    <button onclick="switchTab('yield')" id="tab-yield" class="flex-1 py-4 text-center font-medium tab-inactive transition-colors">Crop Yield Forecasting</button>
+                    <button onclick="switchTab('edge')" id="tab-edge" class="flex-1 py-4 text-center font-medium tab-inactive transition-colors">Edge AI Logic</button>
                 </div>
 
-                <!-- Tab Content -->
                 <div class="p-8">
-                    <!-- Fusion Tab -->
-                    <div id="content-fusion" class="space-y-6">
-                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <!-- Fusion Content -->
+                    <div id="content-fusion">
+                        <div class="flex flex-col md:flex-row gap-12 items-center">
                             <div class="w-full md:w-1/2">
-                                <h3 class="text-xl font-bold text-gray-900 mb-4">The Calibration Problem</h3>
-                                <p class="text-gray-600 mb-4">
-                                    Satellite data (Sentinel-2) gives a macro view (NDVI) but is often blocked by clouds in NE India. Ground sensors are accurate but expensive to deploy everywhere.
+                                <h3 class="text-2xl font-bold text-gray-900 mb-4">Fusion Model</h3>
+                                <p class="text-gray-700 leading-relaxed mb-6">
+                                    Using sparse ground sensors ("Village Sticks") to calibrate dense but noisy satellite data. This fusion provides accurate soil moisture maps for the entire region at a fraction of the cost.
                                 </p>
-                                <div class="bg-green-50 p-4 rounded-lg border border-green-100">
-                                    <h4 class="font-bold text-green-800 text-sm mb-2">Our Solution: Fusion Model</h4>
-                                    <ul class="text-sm text-green-700 space-y-2">
-                                        <li>1. **Village Stick** takes 1 precise reading.</li>
-                                        <li>2. **AI Model** correlates this with available clear satellite pixels.</li>
-                                        <li>3. **Result:** Accurately "predicts" soil moisture for the whole village.</li>
-                                    </ul>
+                                <div class="flex gap-4">
+                                    <div class="bg-white/60 p-3 rounded-lg text-center flex-1">
+                                        <span class="block text-2xl mb-1">🛰️</span>
+                                        <span class="text-xs font-bold text-gray-600">Macro View</span>
+                                    </div>
+                                    <div class="bg-white/60 p-3 rounded-lg text-center flex-1">
+                                        <span class="block text-2xl mb-1">🧬</span>
+                                        <span class="text-xs font-bold text-gray-600">AI Fusion</span>
+                                    </div>
+                                    <div class="bg-white/60 p-3 rounded-lg text-center flex-1">
+                                        <span class="block text-2xl mb-1">🎯</span>
+                                        <span class="text-xs font-bold text-gray-600">Precision</span>
+                                    </div>
                                 </div>
                             </div>
                             <div class="w-full md:w-1/2 flex justify-center">
-                                <!-- CSS Diagram for Fusion -->
+                                <!-- CSS Visual for Fusion -->
                                 <div class="relative w-full max-w-sm h-64 bg-slate-900 rounded-xl overflow-hidden shadow-lg p-4 flex flex-col items-center justify-between">
-                                    <div class="text-center text-white">
-                                        <div class="text-2xl">🛰️</div>
-                                        <div class="text-xs opacity-70">Sentinel-2</div>
-                                    </div>
+                                    <div class="text-center text-white"><div class="text-2xl">🛰️</div><div class="text-xs opacity-70">Sentinel-2</div></div>
                                     <div class="w-0.5 h-full border-l-2 border-dashed border-white/30 absolute left-1/2 top-10 bottom-10"></div>
-                                    <div class="bg-white/10 backdrop-blur-sm p-2 rounded w-full text-center z-10 border border-white/20">
-                                        <div class="text-xs text-green-300 font-mono">ML Fusion Layer</div>
-                                    </div>
+                                    <div class="bg-white/10 backdrop-blur-sm p-2 rounded w-full text-center z-10 border border-white/20"><div class="text-xs text-green-300 font-mono">ML Fusion Layer</div></div>
                                     <div class="flex justify-between w-full text-white mt-auto pt-4">
-                                        <div class="text-center">
-                                            <div class="text-2xl">🦯</div>
-                                            <div class="text-xs opacity-70">IoT Sensor</div>
-                                        </div>
-                                        <div class="text-center">
-                                            <div class="text-2xl">🌾</div>
-                                            <div class="text-xs opacity-70">Farm Analysis</div>
-                                        </div>
+                                        <div class="text-center"><div class="text-2xl">🦯</div><div class="text-xs opacity-70">IoT Sensor</div></div>
+                                        <div class="text-center"><div class="text-2xl">🌾</div><div class="text-xs opacity-70">Farm Analysis</div></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Yield Tab -->
-                    <div id="content-yield" class="hidden space-y-6">
-                        <div class="flex flex-col md:flex-row gap-8">
+                    <!-- Yield Content -->
+                    <div id="content-yield" class="hidden">
+                        <div class="flex flex-col md:flex-row gap-12 items-center">
                             <div class="w-full md:w-1/2">
-                                <h3 class="text-xl font-bold text-gray-900 mb-4">Predictive Logistics</h3>
-                                <p class="text-gray-600 mb-4">
-                                    Using **Random Forest Regression**, we combine historical rainfall data, real-time moisture, and visual crop stage to predict harvest tonnage.
-                                </p>
-                                <p class="text-gray-600 text-sm">
-                                    This allows farmers to negotiate prices *before* harvest, securing better income.
+                                <h3 class="text-2xl font-bold text-gray-900 mb-4">Predictive Logistics</h3>
+                                <p class="text-gray-700 leading-relaxed mb-6">
+                                    Using <strong>Random Forest Regression</strong>, we combine historical rainfall data, real-time moisture, and visual crop stage to predict harvest tonnage. This allows farmers to negotiate prices *before* harvest.
                                 </p>
                             </div>
                             <div class="w-full md:w-1/2">
@@ -506,38 +642,38 @@
                         </div>
                     </div>
 
-                    <!-- Edge Tab -->
-                    <div id="content-edge" class="hidden space-y-6">
-                        <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <!-- Edge Content -->
+                    <div id="content-edge" class="hidden">
+                        <div class="flex flex-col md:flex-row gap-12 items-center">
                             <div class="w-full md:w-1/2">
-                                <h3 class="text-xl font-bold text-gray-900 mb-4">Offline First (TensorFlow Lite)</h3>
-                                <p class="text-gray-600 mb-4">
+                                <h3 class="text-2xl font-bold text-gray-900 mb-4">Offline First (TensorFlow Lite)</h3>
+                                <p class="text-gray-700 leading-relaxed mb-6">
                                     Internet is a luxury in remote NE valleys. We compress AI models to run locally on the device.
                                 </p>
                                 <div class="grid grid-cols-2 gap-4">
-                                    <div class="bg-stone-50 p-4 rounded text-center">
+                                    <div class="bg-red-50 p-4 rounded-xl text-center border border-red-100">
                                         <div class="font-bold text-gray-800">Cloud AI</div>
                                         <div class="text-xs text-gray-500">High Latency</div>
-                                        <div class="text-red-500 font-bold mt-1">Failed</div>
+                                        <div class="text-red-600 font-bold mt-1">Failed</div>
                                     </div>
-                                    <div class="bg-green-50 p-4 rounded text-center border border-green-200">
+                                    <div class="bg-green-50 p-4 rounded-xl text-center border border-green-100">
                                         <div class="font-bold text-green-800">Edge AI</div>
                                         <div class="text-xs text-green-600">Zero Latency</div>
                                         <div class="text-green-600 font-bold mt-1">Success</div>
                                     </div>
                                 </div>
                             </div>
-                             <div class="w-full md:w-1/2">
-                                 <div class="bg-gray-800 text-green-400 font-mono p-4 rounded-lg text-sm shadow-inner">
-                                     <p class="opacity-50">// Pseudocode for Edge Detection</p>
-                                     <p class="mt-2"><span class="text-purple-400">if</span> (!connectivity) {</p>
-                                     <p class="pl-4">model = <span class="text-blue-400">loadModel</span>('tflite_disease_v2');</p>
-                                     <p class="pl-4">image = camera.capture();</p>
-                                     <p class="pl-4">prediction = model.predict(image);</p>
-                                     <p class="pl-4"><span class="text-blue-400">return</span> localVideo(prediction.remedy);</p>
-                                     <p>}</p>
-                                 </div>
-                             </div>
+                            <div class="w-full md:w-1/2">
+                                <div class="bg-gray-900 text-green-400 font-mono p-6 rounded-xl text-sm shadow-inner overflow-x-auto">
+                                    <p class="opacity-50 mb-2">// Pseudocode for Edge Detection</p>
+                                    <p><span class="text-purple-400">if</span> (!connectivity) {</p>
+                                    <p class="pl-4">model = <span class="text-blue-400">loadModel</span>('tflite_disease_v2');</p>
+                                    <p class="pl-4">image = camera.capture();</p>
+                                    <p class="pl-4">prediction = model.predict(image);</p>
+                                    <p class="pl-4"><span class="text-blue-400">return</span> localVideo(prediction.remedy);</p>
+                                    <p>}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -545,59 +681,49 @@
         </div>
     </section>
 
-    <!-- Section 5: Impact & Implementation -->
-    <section id="impact" class="py-16 bg-white">
+    <!-- Impact Section -->
+    <section id="impact" class="py-16">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                
-                <!-- Implementation Table -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
                 <div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Implementation Tiers</h3>
-                    <div class="overflow-hidden border border-gray-200 rounded-xl shadow-sm">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Feature</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-green-700 uppercase tracking-wider bg-green-50">Tier 1 (Zero Cost)</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-orange-700 uppercase tracking-wider bg-orange-50">Tier 2 (Low Cost)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Target User</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Individual Farmer</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Village Co-op (FPO)</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Hardware</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Existing Phone</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Shared "Village Stick"</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Cost</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">₹0</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-orange-600">~₹50 / farmer</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">Capabilities</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Weather, Visual Check</td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">Lab-grade Soil Data</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Impact Chart -->
-                <div>
-                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Resource Conservation Impact</h3>
-                    <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 flex flex-col items-center">
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Resource Impact</h3>
+                    <div class="glass-panel p-8 rounded-3xl border border-white/50 flex flex-col items-center">
                         <div class="chart-container">
                             <canvas id="impactChart"></canvas>
                         </div>
-                        <p class="text-sm text-center text-gray-600 mt-4">
-                            Precision irrigation based on sensor data reduces water usage by 30% compared to traditional blanket watering.
-                        </p>
+                        <p class="text-sm font-semibold text-center text-gray-600 mt-6 bg-white/50 px-4 py-2 rounded-full">30% Water Saving via Precision Irrigation</p>
+                    </div>
+                </div>
+                 <!-- Implementation Table -->
+                 <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-6">Implementation Tiers</h3>
+                    <div class="overflow-hidden border border-white/50 rounded-3xl shadow-sm glass-panel">
+                        <table class="min-w-full divide-y divide-gray-200/50">
+                            <thead class="bg-green-50/50">
+                                <tr>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Feature</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-green-700 uppercase tracking-wider">Zero Cost</th>
+                                    <th class="px-6 py-4 text-left text-xs font-bold text-orange-700 uppercase tracking-wider">Low Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-transparent divide-y divide-gray-200/50">
+                                <tr>
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-800">User</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Individual</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Community</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-800">Hardware</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Existing Phone</td>
+                                    <td class="px-6 py-4 text-sm text-gray-600">Shared Stick</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-6 py-4 text-sm font-medium text-gray-800">Cost</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-green-600 text-lg">₹0</td>
+                                    <td class="px-6 py-4 text-sm font-bold text-orange-600 text-lg">₹50</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -605,17 +731,16 @@
     </section>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
-            <div class="mb-4 md:mb-0">
-                <span class="text-2xl font-bold">Agri<span class="text-yellow-500">Vani</span></span>
-                <p class="text-gray-400 text-sm mt-2">Prepared for Agricultural Research & Development Initiative (India)</p>
+    <footer class="bg-gray-900 text-white py-12 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="text-center md:text-left">
+                <span class="text-2xl font-bold flex items-center justify-center md:justify-start gap-2">
+                    <i class="ph ph-plant text-green-400"></i> Agri<span class="text-yellow-500">Vani</span>
+                </span>
+                <p class="text-gray-400 text-sm mt-2">Assam Engineering College • MCA Dept</p>
+                <p class="text-gray-500 text-xs mt-1">Jalukbari, Assam - 781013</p>
             </div>
-            <div class="flex space-x-6">
-                <a href="#" class="text-gray-400 hover:text-white">Privacy</a>
-                <a href="#" class="text-gray-400 hover:text-white">Contact</a>
-                <a href="#" class="text-gray-400 hover:text-white">Research Paper</a>
-            </div>
+            <div class="text-gray-500 text-sm">© 2024 Research Initiative</div>
         </div>
     </footer>
 
@@ -627,7 +752,6 @@
             if (element) {
                 element.scrollIntoView({ behavior: 'smooth' });
             }
-            // Close mobile menu if open
             document.getElementById('mobile-menu').classList.add('hidden');
         }
 
@@ -636,7 +760,20 @@
             menu.classList.toggle('hidden');
         }
 
-        // --- Toggle Solution View ---
+        // --- Guide Bot Logic ---
+        function toggleGuide() {
+            const bubble = document.getElementById('guide-bubble');
+            bubble.style.display = bubble.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function speakGuide(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1.1;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- Solution Toggle Logic ---
         function switchSolution(type) {
             const contentDigital = document.getElementById('solution-content-digital');
             const contentPhysical = document.getElementById('solution-content-physical');
@@ -687,217 +824,187 @@
             activeBtn.classList.add('tab-active');
         }
 
-        // --- App Simulator Logic ---
-        let simState = 'idle';
-        let currentScenario = '';
+        // --- Voice Demo Logic ---
+        let currentLang = 'en';
+        const scenarios = {
+            'pesticide': {
+                'en': { user: "Is this pesticide safe?", ai: "Warning! Dangerous chemicals detected. Do not buy.", icon: "☠️", color: "text-red-600" },
+                'hi': { user: "क्या यह कीटनाशक सुरक्षित है?", ai: "चेतावनी! खतरनाक रसायन मिले। मत खरीदो।", icon: "☠️", color: "text-red-600" },
+                'as': { user: "এই ঔষধটো ভাল নে?", ai: "সাৱধান! বিপদজনক ৰাসায়নিক আছে। নিকিনিব।", icon: "☠️", color: "text-red-600" }
+            },
+            'disease': {
+                'en': { user: "Look at these spots.", ai: "Yellow Leaf Spot detected. Use Neem Oil tonight.", icon: "🍃", color: "text-orange-600" },
+                'hi': { user: "पत्तियों पर धब्बे देखो।", ai: "पीला पत्ती रोग है। नीम का तेल इस्तेमाल करें।", icon: "🍃", color: "text-orange-600" },
+                'as': { user: "পাতবোৰত দাগ পৰিছে।", ai: "হালধীয়া পাতৰ বেমাৰ। নিম তেল ব্যৱহাৰ কৰক।", icon: "🍃", color: "text-orange-600" }
+            },
+            'soil': {
+                'en': { user: "Check soil quality.", ai: "Soil is acidic (pH 5.2). Add lime before planting.", icon: "🟤", color: "text-blue-600" },
+                'hi': { user: "मिट्टी की जाँच करो।", ai: "मिट्टी अम्लीय है। चूना डालें।", icon: "🟤", color: "text-blue-600" },
+                'as': { user: "মাটিডৰা কেনেকুৱা?", ai: "মাটিখিনি আম্লিক। চুণ দিয়ক।", icon: "🟤", color: "text-blue-600" }
+            },
+            'weather': {
+                'en': { user: "Will it rain today?", ai: "Heavy rain in 4 hours. Do not apply fertilizer.", icon: "🌦️", color: "text-blue-500" },
+                'hi': { user: "क्या आज बारिश होगी?", ai: "4 घंटे में भारी बारिश होगी। खाद न डालें।", icon: "🌦️", color: "text-blue-500" },
+                'as': { user: "আজি বৰষুণ দিব নেকি?", ai: "চাৰি ঘণ্টাৰ পাছত বৰষুণ দিব। সাৰ নিদিব।", icon: "🌦️", color: "text-blue-500" }
+            }
+        };
 
-        function runSimulation(scenario) {
-            currentScenario = scenario;
-            resetSim();
-            // In a real app, this would set context. Here, we highlight the button or just prompt user.
-            triggerMic(); // Auto start for smoother demo flow
+        function setLang(lang) {
+            currentLang = lang;
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('bg-green-700', 'text-white', 'border-green-700');
+                btn.classList.add('border-gray-300', 'bg-white/50');
+            });
+            document.getElementById(`lang-${lang}`).classList.add('bg-green-700', 'text-white', 'border-green-700');
+            document.getElementById(`lang-${lang}`).classList.remove('border-gray-300', 'bg-white/50');
         }
 
-        function triggerMic() {
-            if (simState !== 'idle') return;
-            simState = 'listening';
+        function triggerManualMic() { runScenario('disease'); }
+
+        function runScenario(type) {
+            const overlay = document.getElementById('ui-overlay');
+            const data = scenarios[type][currentLang];
             
-            document.getElementById('state-idle').classList.add('hidden');
-            document.getElementById('state-listening').classList.remove('hidden');
+            overlay.classList.remove('hidden');
+            overlay.style.display = 'flex';
+            
+            // 1. Initial Scanning / Listening View
+            if (type === 'pesticide') {
+                overlay.innerHTML = `
+                    <div class="relative w-48 h-64 border-2 border-gray-400 rounded-lg overflow-hidden flex items-center justify-center bg-gray-900/10">
+                        <!-- Viewfinder corners -->
+                        <div class="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-green-500"></div>
+                        <div class="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-green-500"></div>
+                        <div class="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-green-500"></div>
+                        <div class="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-green-500"></div>
+                        
+                        <!-- Bottle Icon -->
+                        <i class="ph ph-flask text-6xl text-gray-700"></i>
+                        <p class="absolute bottom-12 text-xs text-white bg-black/50 px-2 rounded">Align Bottle</p>
 
-            // Simulate listening delay
-            setTimeout(() => {
-                simState = 'processing';
-                document.getElementById('state-listening').classList.add('hidden');
-                document.getElementById('state-processing').classList.remove('hidden');
-                
-                // Update processing text based on scenario
-                const processText = document.getElementById('process-text');
-                if (currentScenario === 'disease') processText.innerText = "Analyzing Leaf Patterns...";
-                else if (currentScenario === 'soil') processText.innerText = "Checking Soil Health Card...";
-                else processText.innerText = "Fetching IMD Weather Data...";
-
-                // Simulate processing delay
-                setTimeout(() => {
-                    showResult();
-                }, 1500);
-            }, 1500);
-        }
-
-        function showResult() {
-            simState = 'result';
-            document.getElementById('state-processing').classList.add('hidden');
-            const resultDiv = document.getElementById('state-result');
-            resultDiv.classList.remove('hidden');
-            const contentDiv = document.getElementById('result-content');
-
-            // Dynamic Content Generation based on Scenario
-            let html = '';
-            if (currentScenario === 'disease') {
-                html = `
-                    <div class="bg-red-50 p-4 rounded-xl border border-red-100 mb-4">
-                        <h4 class="font-bold text-red-800 text-lg">⚠️ Rice Blast Detected</h4>
-                        <div class="w-full h-32 bg-gray-300 rounded-lg mt-2 mb-2 flex items-center justify-center text-4xl overflow-hidden relative">
-                           🍃
-                           <div class="absolute inset-0 bg-black/10 flex items-center justify-center">
-                                <div class="w-16 h-16 border-2 border-red-500 rounded-full animate-ping absolute"></div>
-                           </div>
-                        </div>
+                        <!-- Scanning Laser -->
+                        <div class="scan-laser"></div>
                     </div>
-                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-                        <h5 class="font-bold text-gray-700">Remedy (Organic)</h5>
-                        <p class="text-sm text-gray-600 mt-1">Mix Neem Oil (5ml) with 1L water. Spray in evening.</p>
-                        <div class="mt-2 h-10 bg-green-100 rounded flex items-center justify-center text-green-700 font-bold text-xs cursor-pointer">▶ Play Video Guide</div>
-                    </div>
+                    <p class="font-bold text-lg text-gray-800 mt-4">Scanning Label...</p>
                 `;
-            } else if (currentScenario === 'soil') {
-                html = `
-                     <div class="bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4">
-                        <h4 class="font-bold text-orange-800 text-lg">Soil Status: Acidic</h4>
-                        <div class="flex justify-between mt-3 text-sm">
-                            <span class="text-gray-500">pH Level</span>
-                            <span class="font-bold text-orange-600">5.2 (Low)</span>
-                        </div>
-                         <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                            <div class="bg-orange-500 h-2.5 rounded-full" style="width: 35%"></div>
-                        </div>
+            } else if (type === 'disease') {
+                overlay.innerHTML = `
+                    <div class="relative w-48 h-48 bg-green-50 rounded-lg border-2 border-dashed border-green-300 flex items-center justify-center overflow-hidden">
+                        <i class="ph ph-plant text-7xl text-green-600"></i>
+                        <!-- Target Reticle Animation -->
+                        <div class="absolute w-24 h-24 border-2 border-red-500 rounded-lg animate-[ping_2s_infinite]"></div>
+                        <div class="absolute w-full h-0.5 bg-red-500 top-1/2 animate-[scan-laser_1.5s_infinite]"></div>
                     </div>
-                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100">
-                        <h5 class="font-bold text-gray-700">Recommendation</h5>
-                        <p class="text-sm text-gray-600 mt-1">Add Agricultural Lime before sowing next crop.</p>
-                    </div>
+                    <p class="font-bold text-lg text-gray-800 mt-4">Scanning Leaf...</p>
                 `;
-            } else {
-                // Weather
-                html = `
-                    <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-4 text-center">
-                        <div class="text-6xl mb-2">🌧️</div>
-                        <h4 class="font-bold text-blue-800 text-2xl">Heavy Rain</h4>
-                        <p class="text-blue-600">Expected in 4 hours</p>
+            } else if (type === 'soil') {
+                overlay.innerHTML = `
+                    <div class="relative w-48 h-48 bg-stone-100 rounded-xl overflow-hidden flex items-end justify-center gap-2 p-4 border border-stone-200">
+                        <div class="w-8 bg-amber-600 rounded-t-md bar-grow h-0" style="animation-delay: 0.1s"></div>
+                        <div class="w-8 bg-amber-500 rounded-t-md bar-grow h-0" style="animation-delay: 0.3s"></div>
+                        <div class="w-8 bg-amber-400 rounded-t-md bar-grow h-0" style="animation-delay: 0.5s"></div>
+                        <i class="ph ph-eyedropper text-4xl text-stone-500 absolute top-4"></i>
                     </div>
-                    <div class="bg-white p-3 rounded-lg shadow-sm border border-gray-100 border-l-4 border-l-red-500">
-                        <h5 class="font-bold text-gray-700">⚠️ Advisory</h5>
-                        <p class="text-sm text-gray-600 mt-1">Do not apply fertilizer today. It will wash away.</p>
+                    <p class="font-bold text-lg text-gray-800 mt-4">Analyzing Soil...</p>
+                `;
+            } else if (type === 'weather') {
+                overlay.innerHTML = `
+                    <div class="relative w-48 h-48 rounded-full border-2 border-blue-200 flex items-center justify-center bg-blue-50 overflow-hidden">
+                        <div class="radar-sweep"></div>
+                        <i class="ph ph-globe-hemisphere-east text-6xl text-blue-300 relative z-10"></i>
+                        <div class="absolute w-2 h-2 bg-red-500 rounded-full top-10 right-10 animate-ping"></div>
                     </div>
+                    <p class="font-bold text-lg text-gray-800 mt-4">Fetching Satellite Data...</p>
                 `;
             }
-            contentDiv.innerHTML = html;
+
+            // 2. Processing (Simulated Delay)
+            setTimeout(() => {
+                let analysisText = "Processing Data...";
+                if (type === 'pesticide') analysisText = "Analyzing Chemical Composition...";
+                if (type === 'disease') analysisText = "Matching Disease Patterns...";
+                if (type === 'soil') analysisText = "Measuring NPK Levels...";
+                if (type === 'weather') analysisText = "Connecting to IMD Satellite...";
+                
+                overlay.innerHTML = `
+                    <div class="animate-spin text-5xl mb-4 text-green-600"><i class="ph ph-spinner-gap"></i></div>
+                    <p class="font-bold text-lg text-gray-700">${analysisText}</p>
+                    <p class="text-xs text-gray-500 mt-1">Edge AI Running</p>
+                `;
+
+                // 3. Result & Speak
+                setTimeout(() => {
+                    overlay.innerHTML = `
+                        <button onclick="document.getElementById('ui-overlay').style.display='none'" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="ph ph-x text-2xl"></i></button>
+                        <div class="bg-white p-4 rounded-xl shadow border w-full mb-4">
+                            <span class="text-4xl block mb-2">${data.icon}</span>
+                            <p class="font-bold text-gray-800 text-lg">${type === 'pesticide' ? 'Alert' : 'Diagnosis'}</p>
+                        </div>
+                        <p class="text-gray-800 font-medium leading-relaxed">"${data.ai}"</p>
+                        <div class="mt-4"><i class="ph ph-speaker-high text-3xl text-green-600 animate-pulse"></i></div>
+                    `;
+                    speakApp(data.ai, currentLang);
+                }, 2000); // 2 seconds for analysis
+            }, 2500); // 2.5 seconds for scanning/animation
         }
 
-        function resetSim() {
-            simState = 'idle';
-            document.getElementById('state-result').classList.add('hidden');
-            document.getElementById('state-idle').classList.remove('hidden');
-            document.getElementById('state-listening').classList.add('hidden');
-            document.getElementById('state-processing').classList.add('hidden');
+        function speakApp(text, lang) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            if (lang === 'hi') utterance.lang = 'hi-IN';
+            else if (lang === 'en') utterance.lang = 'en-US';
+            else utterance.lang = 'hi-IN'; // Fallback for Assamese
+            window.speechSynthesis.speak(utterance);
         }
 
-
-        // --- Chart.js Implementations ---
+        // --- Charts ---
         window.addEventListener('load', function() {
-            // 1. Cost Comparison Chart
-            const ctxCost = document.getElementById('costChart').getContext('2d');
-            new Chart(ctxCost, {
+            // Cost Chart
+            new Chart(document.getElementById('costChart').getContext('2d'), {
                 type: 'bar',
                 data: {
-                    labels: ['Standard IoT Setup', 'Agri-Vani (Tier 1)', 'Community IoT (Tier 2)'],
+                    labels: ['Standard IoT', 'Agri-Vani (Tier 1)', 'Village Stick (Tier 2)'],
                     datasets: [{
                         label: 'Cost (INR)',
                         data: [50000, 0, 50],
-                        backgroundColor: ['#e5e7eb', '#15803d', '#ea580c'], // Gray, Green, Orange
-                        borderColor: ['#d1d5db', '#14532d', '#9a3412'],
-                        borderWidth: 1
+                        backgroundColor: ['#d1d5db', '#15803d', '#ea580c']
                     }]
                 },
                 options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        title: { display: true, text: 'Implementation Cost Per Farmer' },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return '₹ ' + context.raw.toLocaleString();
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            type: 'logarithmic', // Log scale because 50 vs 50000 is huge diff
-                            title: { display: true, text: 'Cost (INR) - Log Scale' }
-                        }
-                    }
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { y: { type: 'logarithmic' } }
                 }
             });
 
-            // 2. Impact Chart (Doughnut)
-            const ctxImpact = document.getElementById('impactChart').getContext('2d');
-            new Chart(ctxImpact, {
+            // Impact Chart
+            new Chart(document.getElementById('impactChart').getContext('2d'), {
                 type: 'doughnut',
                 data: {
-                    labels: ['Water Used', 'Water Saved'],
-                    datasets: [{
-                        data: [70, 30],
-                        backgroundColor: ['#d1fae5', '#3b82f6'], // Light Green, Blue
-                        hoverOffset: 4
-                    }]
+                    labels: ['Used', 'Saved'],
+                    datasets: [{ data: [70, 30], backgroundColor: ['#d1fae5', '#3b82f6'] }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: true, text: 'Water Usage Comparison' }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false }
             });
-
-            // 3. Yield Chart (Line)
-            const ctxYield = document.getElementById('yieldChart').getContext('2d');
-            new Chart(ctxYield, {
+            
+             // Yield Chart
+             new Chart(document.getElementById('yieldChart').getContext('2d'), {
                 type: 'line',
                 data: {
-                    labels: ['Week 4', 'Week 8', 'Week 12', 'Week 16 (Harvest)'],
+                    labels: ['Week 1', 'Week 4', 'Week 8', 'Harvest'],
                     datasets: [{
-                        label: 'Actual Yield',
-                        data: [null, null, null, 4.2], // Final data point
-                        borderColor: '#15803d',
-                        backgroundColor: '#15803d',
-                        pointRadius: 6
-                    }, {
                         label: 'AI Prediction',
-                        data: [3.8, 4.0, 4.1, 4.2],
-                        borderColor: '#ca8a04',
-                        borderDash: [5, 5],
-                        fill: false
+                        data: [3.5, 3.9, 4.1, 4.2],
+                        borderColor: '#ea580c', borderDash: [5, 5], fill: false
+                    }, {
+                         label: 'Actual',
+                         data: [null, null, null, 4.2],
+                         borderColor: '#15803d', backgroundColor: '#15803d', pointRadius: 5
                     }]
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        title: { display: true, text: 'Yield Forecast Accuracy (Tons/Ha)' },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return context[0].label;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            title: { display: true, text: 'Yield (Tons)' },
-                            suggestedMin: 3,
-                            suggestedMax: 5
-                        }
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false }
             });
         });
-
     </script>
 </body>
 </html>
