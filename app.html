@@ -157,7 +157,7 @@
                                 <i class="ph ph-microphone-fill"></i>
                             </button>
                         </div>
-                        <p class="mt-6 text-gray-800 font-semibold text-lg">"How is my soil?"</p>
+                        <p class="mt-6 text-gray-800 font-semibold text-lg" id="voice-prompt">"How is my soil?"</p>
                         
                         <!-- Decorative background rings -->
                         <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-green-50 rounded-full"></div>
@@ -403,10 +403,58 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
+        // --- Translations ---
+        const translations = {
+            en: {
+                welcome: "How is my soil?",
+                voice_idle: "Tap microphone to speak...",
+                voice_listen: "Listening...",
+                voice_process: "Processing...",
+                unknown: "Sorry, I didn't catch that.",
+                disease_open: "Opening Plant Doctor",
+                soil_open: "Opening Soil Laboratory",
+                weather_open: "Checking Local Forecast",
+                pesticide_danger: "Warning. High toxicity detected. Do not use.",
+                disease_detect: "Rice blast detected. Apply Neem oil treatment.",
+                stick_connected: "Village Stick connected. Receiving data."
+            },
+            hi: {
+                welcome: "मेरी मिट्टी कैसी है?",
+                voice_idle: "बोलने के लिए माइक टैप करें...",
+                voice_listen: "सुन रहा हूँ...",
+                voice_process: "प्रक्रिया चल रही है...",
+                unknown: "क्षमा करें, समझ नहीं आया।",
+                disease_open: "पौधा चिकित्सक खुल रहा है",
+                soil_open: "मिट्टी प्रयोगशाला खुल रही है",
+                weather_open: "स्थानीय मौसम की जाँच",
+                pesticide_danger: "चेतावनी। उच्च विषाक्तता। उपयोग न करें।",
+                disease_detect: "धान का रोग मिला। नीम का तेल लगाएँ।",
+                stick_connected: "विलेज स्टिक कनेक्ट हो गया। डेटा प्राप्त हो रहा है।"
+            },
+            as: {
+                welcome: "মোৰ মাটিডৰা কেনেকুৱা?",
+                voice_idle: "কবলৈ মাইক টিপক...",
+                voice_listen: "শুনি আছোঁ...",
+                voice_process: "প্ৰক্ৰিয়া চলি আছে...",
+                unknown: "ক্ষমা কৰিব, বুজি পোৱা নাই।",
+                disease_open: "গছৰ চিকিৎসক খুলিছো",
+                soil_open: "মাটি পৰীক্ষাগাৰ খুলিছো",
+                weather_open: "বতৰৰ খবৰ লৈছো",
+                pesticide_danger: "সাৱধান! বিষাক্ত দৰৱ। ব্যৱহাৰ নকৰিব।",
+                disease_detect: "ধানৰ বেমাৰ ধৰা পৰিছে। নিম তেল ব্যৱহাৰ কৰক।",
+                stick_connected: "গাওঁৰ লাঠি সংযোগ হৈছে। তথ্য পোৱা গৈছে।"
+            }
+        };
+
         // State
         let currentLang = 'en';
         let currentMode = '';
         let recognition;
+
+        // --- Helper to get Text ---
+        function getText(key) {
+            return translations[currentLang][key] || translations['en'][key];
+        }
 
         // --- Navigation ---
         function nav(screenId, mode = null) {
@@ -453,18 +501,17 @@
 
             if (!recognition) {
                 recognition = new webkitSpeechRecognition();
-                recognition.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
                 recognition.continuous = false;
                 
                 recognition.onstart = () => {
                     btn.classList.add('mic-active');
-                    status.innerText = "Listening...";
+                    status.innerText = getText("voice_listen");
                     status.className = "text-green-600 font-bold text-sm mb-6 animate-pulse";
                 };
                 
                 recognition.onend = () => {
                     btn.classList.remove('mic-active');
-                    status.innerText = "Processing...";
+                    status.innerText = getText("voice_process");
                     status.className = "text-gray-400 text-sm font-medium mb-6";
                 };
 
@@ -474,21 +521,24 @@
                     setTimeout(() => processVoiceCommand(text), 1000);
                 };
             }
+            // Set Lang before starting
+            recognition.lang = currentLang === 'hi' ? 'hi-IN' : (currentLang === 'as' ? 'bn-IN' : 'en-US');
             recognition.start();
         }
 
         function processVoiceCommand(text) {
-            if (text.includes('disease') || text.includes('plant') || text.includes('check')) {
-                speak("Opening Plant Doctor");
+            // Check keywords across languages (Simplified check)
+            if (text.includes('disease') || text.includes('plant') || text.includes('bimar') || text.includes('rog') || text.includes('pat')) {
+                speak(getText("disease_open"));
                 nav('screen-camera', 'disease');
-            } else if (text.includes('soil') || text.includes('test')) {
-                speak("Opening Soil Laboratory");
+            } else if (text.includes('soil') || text.includes('test') || text.includes('mitti') || text.includes('mati') || text.includes('saar')) {
+                speak(getText("soil_open"));
                 nav('screen-soil');
-            } else if (text.includes('weather') || text.includes('rain')) {
-                speak("Checking Local Forecast");
+            } else if (text.includes('weather') || text.includes('rain') || text.includes('mausam') || text.includes('botor') || text.includes('boroshun')) {
+                speak(getText("weather_open"));
                 nav('screen-weather');
             } else {
-                speak("Sorry, I didn't catch that.");
+                speak(getText("unknown"));
             }
         }
 
@@ -498,17 +548,28 @@
             
             // Better Voice Selection
             const voices = window.speechSynthesis.getVoices();
-            const preferredVoice = voices.find(v => v.lang.includes(currentLang === 'hi' ? 'hi' : 'en') && v.name.includes('Google'));
+            const preferredVoice = voices.find(v => v.lang.includes(currentLang === 'hi' ? 'hi' : (currentLang === 'as' ? 'bn' : 'en')) && v.name.includes('Google'));
             if(preferredVoice) utterance.voice = preferredVoice;
 
-            utterance.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+            if (currentLang === 'hi') utterance.lang = 'hi-IN';
+            else if (currentLang === 'as') utterance.lang = 'bn-IN'; // Assamese Proxy
+            else utterance.lang = 'en-US';
+            
             window.speechSynthesis.speak(utterance);
         }
 
         function toggleLang() {
-            currentLang = currentLang === 'en' ? 'hi' : 'en';
+            if (currentLang === 'en') currentLang = 'hi';
+            else if (currentLang === 'hi') currentLang = 'as';
+            else currentLang = 'en';
+
             document.getElementById('lang-btn').innerText = currentLang.toUpperCase();
-            speak(currentLang === 'en' ? "Language English" : "भाषा हिंदी");
+            
+            // Update UI text
+            document.getElementById('voice-status').innerText = getText("voice_idle");
+            document.getElementById('voice-prompt').innerText = "\"" + getText("welcome") + "\"";
+            
+            speak(currentLang === 'en' ? "Language English" : (currentLang === 'hi' ? "भाषा हिंदी" : "অসমীয়া ভাষা"));
         }
 
         // --- Camera Logic ---
@@ -546,14 +607,14 @@
                     title.innerText = "High Toxicity";
                     title.className = "font-bold text-red-600 text-lg";
                     desc.innerText = "Chlorpyrifos detected. Harmful to bees.";
-                    speak("Warning. High toxicity detected. Do not use.");
+                    speak(getText("pesticide_danger"));
                 } else {
                     icon.innerText = "🍂";
                     iconBg.className = "w-12 h-12 rounded-full flex items-center justify-center text-2xl bg-orange-100";
                     title.innerText = "Rice Blast";
                     title.className = "font-bold text-orange-600 text-lg";
                     desc.innerText = "Fungal infection. Use Neem Oil.";
-                    speak("Rice blast detected. Apply Neem oil treatment.");
+                    speak(getText("disease_detect"));
                 }
             }, 1500);
         }
@@ -579,7 +640,7 @@
                 document.getElementById('connect-card').className = "bg-gray-900 rounded-2xl p-6 text-white text-center shadow-xl mb-6 border border-green-900";
                 
                 document.getElementById('soil-data').classList.remove('hidden');
-                speak("Village Stick connected. Receiving data.");
+                speak(getText("stick_connected"));
             }, 2000);
         }
     </script>
